@@ -1,8 +1,6 @@
 import { useState, useCallback } from 'react';
 import RegisterButton from './register-buttons';
 import axios from 'axios';
-import { eventListeners } from '@popperjs/core';
-
 
 export default function Register() {
 
