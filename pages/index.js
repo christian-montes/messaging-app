@@ -8,7 +8,6 @@ export default function Home() {
     <Layout>
       <LoginForm />
 
-      <br />
       <hr />
 
       <p>
