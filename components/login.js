@@ -11,7 +11,7 @@ export default function LoginForm() {
             id='floating-username'
             placeholder='username123'
             />
-            <label for='floating-username'>Username</label>
+            <label htmlFor='floating-username'>Username</label>
           </div>
 
           <div className='form-floating mb-2'>
@@ -21,7 +21,7 @@ export default function LoginForm() {
             id='floating-password'
             placeholder='Password'
             />
-            <label for='floating-password'>Password</label>
+            <label htmlFor='floating-password'>Password</label>
           </div>
 
           <div className='d-grid gap-2'>
