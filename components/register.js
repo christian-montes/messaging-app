@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import RegisterButton from './register-buttons';
 import axios from 'axios';
 
@@ -34,12 +34,13 @@ export default function Register() {
     setUsername(event.target.value)
 
     const response = await axios({
+      // GET requests send params to backend to check is username is taken
       method: 'GET',
       url: '/api/register',
       headers: {
         'Content-Type': 'application/json'
       },
-      data: {
+      params: {
         username: event.target.value
       }
     });
@@ -83,7 +84,11 @@ export default function Register() {
             </div>
 
             <div className='d-grid gap-2'>
-              <button className='btn btn-success' type='button' disabled={!username}>Register</button>
+              <button 
+                className='btn btn-success' 
+                type='button' 
+                disabled={!(username && password.length >= 5)}>Register
+              </button>
             </div>
           </div>
           <div className='d-grid gap-2 col-sm divider'>
