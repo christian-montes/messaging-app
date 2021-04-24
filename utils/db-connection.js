@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 
 // importing URI string and db name environment variables
-const { MONGODB_URI, MONGODB_DB } = process.env;
+const { MONGODB_URI, MONGODB_DB, MONGODB_COLLECTION } = process.env;
 
 // throw error if mongo uri is not defined
 if (!MONGODB_URI) {
@@ -30,7 +30,7 @@ if (!MONGODB_DB) {
    cached = global.mongo = {conn: null, promise: null}
  };
 
- export async function connectToDatabase() {
+ export default async function connectToDatabase() {
   // if cached.conn is not null return it
   // used when the function is called again
   // this is used instead of calling Client.connect again
@@ -45,14 +45,14 @@ if (!MONGODB_DB) {
   if (!cached.promise) {
     // defining the options used to connect to the client
     const opts = {
-      useNewUrlParse: true,
+      useNewUrlParser: true,
       useUnifiedTopology: true,
     };
 
     cached.promise = MongoClient.connect(MONGODB_URI, opts).then((client) => {
       return {
         client,
-        db: client.db(MONGODB_DB),
+        db: client.db(MONGODB_DB).collection(MONGODB_COLLECTION),
       }
     })
   }
