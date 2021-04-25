@@ -8,7 +8,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [style, setStyle] = useState({border: '1px solid lightgrey'})
 
-  async function registerUser(event) {
+  const registerUser = async event => {
     event.preventDefault();
     
     const response = await axios({
@@ -18,14 +18,12 @@ export default function Register() {
         'Content-Type': 'application/json'
       },
       data: {
-        username: username,
-        password: password
+        username: event.target.username.value,
+        password: event.target.password.value
       }
-    }).then(
-      r => {r.json()}
-    );
+    });
 
-    // const { usernameTaken } = response;
+    const { registerSuccess } = response;
 
   }
 
@@ -45,7 +43,7 @@ export default function Register() {
       }
     });
 
-    console.log(response)
+    // console.log(response)
     const { usernameTaken } = response.data;
 
     usernameTaken && (setStyle({border: '2px solid red'}))
@@ -57,23 +55,25 @@ export default function Register() {
 
       <div className='container'>
         <div className='row'>
-          <div className='col-sm'>
+          <form className='col-sm' onSubmit={registerUser}>
             <div className='form-floating mb-2'>
               <input 
                 defaultValue={username}
+                name='username'
                 style={style}
                 onChange={checkUsername}
                 type='username' 
                 className='form-control' 
-                id='new-username'
+                id='username'
                 placeholder='Username'
               />
-              <label htmlFor='new-username'>Username</label>
+              <label htmlFor='username'>Username</label>
             </div>
 
             <div className='form-floating mb-2'>
               <input 
                 defaultValue={password}
+                name='password'
                 onChange={(e) => setPassword(e.target.value)}
                 type='password' 
                 className='form-control' 
@@ -86,11 +86,11 @@ export default function Register() {
             <div className='d-grid gap-2'>
               <button 
                 className='btn btn-success' 
-                type='button' 
+                type='submit' 
                 disabled={!(username && password.length >= 5)}>Register
               </button>
             </div>
-          </div>
+          </form>
           <div className='d-grid gap-2 col-sm divider'>
             <RegisterButton google />
             <RegisterButton />
