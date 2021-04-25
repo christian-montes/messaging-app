@@ -4,7 +4,7 @@ export default async function handler(req, res) {
 
   // cached mongo db instance used
   const { db } = await connectToDatabase();
-  // console.log(req.method);
+  console.log(req.body);
 
   return new Promise(resolve => {
     switch (req.method) {
@@ -26,7 +26,17 @@ export default async function handler(req, res) {
       }
 
       case 'POST': {
-        // statements
+        try {
+          const { username: user, password } = req.body;
+
+          db.insertOne({username: user, password: password}, 
+            (err, doc) => {
+              err ? res.json({error: true})
+              : (done(null, doc.ops[0]))
+            })
+        } catch (error) {
+          console.error(error);
+        }
       }
     }
     
