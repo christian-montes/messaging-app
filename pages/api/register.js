@@ -1,51 +1,39 @@
-import connectToDatabase from '../../utils/db-connection';
+import nextConnect from 'next-connect';
+import auth from '../../middleware/auth';
+import { createUser, findUserById, findUserByUsername } from '../../utils/db';
 
-export default async function handler(req, res) {
+const handler = nextConnect();
 
-  // cached mongo db instance used
-  const { db } = await connectToDatabase();
-  console.log(req.body);
+handler
+  // use the Passport authentication middleware
+  .use(auth)
+  // get request to check if username is taken
+  .get(async (req, res) => {
 
-  return new Promise(resolve => {
-    switch (req.method) {
-      case 'GET': {
-        try {
-          const { username: user } = req.query;
+    const { username: user } = req.query;
+    const userExists = await findUserByUsername(user);
 
-          db.findOne({username: user}, 
-            (err, user) => {
-              return err ? (console.error(err))
-              : (user) ? (res.status(200).json({usernameTaken: true}), resolve())
-              : (res.status(200).json({usernameTaken: false}), resolve())
-            })
-        } catch (error) {
-          console.error('Database error');
-          res.status(500).json({usernameTaken: 'error'});
-          return resolve();
-        }
-      }
+    console.log(!!userExists);
 
-      case 'POST': {
-        try {
-          const { username: user, password } = req.body;
-
-          db.insertOne({username: user, password: password}, 
-            (err, doc) => {
-              err ? res.json({error: true})
-              : (done(null, doc.ops[0]))
-            })
-        } catch (error) {
-          console.error(error);
-        }
-      }
+    if (userExists) {
+      res.status(200).send('Username is taken');
+    } else {
+      res.status(201).send('Username available');
     }
-    
-    // res.status(405).end();
-    // return resolve();
   })
+  .post((req, res) => {
 
+    const { body: userInformation } = req;
+    const newUser = createUser(userInformation);
 
-  // console.log(user);
-  
-  // res.json({usernameTaken: true});
-}
+    req.login(newUser, (err) => {
+      if (err) throw err
+
+      // log the newly registered user in
+      // status 201: new resource created
+      res.status(201).json({newUser})
+    })
+  });
+
+  export default handler
+
