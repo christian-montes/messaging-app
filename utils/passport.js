@@ -15,7 +15,7 @@ passport.deserializeUser((req, id, done) => {
 
   // findUserByUsername function from .db
   // deserialize the user and return the user object stored in DB
-  const user = await findUserById(req, id);
+  const user = findUserById(req, id);
   done(null, user)
 });
 
@@ -37,3 +37,5 @@ passport.use(
     }
   )
 )
+
+export default passport
