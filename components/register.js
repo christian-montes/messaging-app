@@ -32,7 +32,7 @@ export default function Register() {
     setUsername(event.target.value)
 
     const response = await axios({
-      // GET requests send params to backend to check is username is taken
+      // GET requests send params to backend to check if username is taken
       method: 'GET',
       url: '/api/register',
       headers: {
@@ -44,9 +44,13 @@ export default function Register() {
     });
 
     // console.log(response)
-    const { usernameTaken } = response.data;
+    const { status } = response;
+    if (status === 201) {
+      setStyle({border: '2px solid green'});
+    } else {
+      setStyle({border: '2px solid red'})
+    }
 
-    usernameTaken && (setStyle({border: '2px solid red'}))
   }
 
   return (
