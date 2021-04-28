@@ -52,14 +52,15 @@ export async function findUserById(id) {
  */
 export async function findUserByUsername(username) {
   const { db } = await connectToDatabase();
-  let user
+  // let user
 
   await db.findOne({username: username}, (err, doc) => {
     if (err) return err;
-    user = doc;
+    // user = doc;
+    return doc
   })
-  console.log(user)
-  return user
+  // console.log(user)
+  // return user
 }
 
 export async function validatePassword({ hash }, passwordEntered) {
