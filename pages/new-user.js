@@ -3,7 +3,7 @@ import Register from '../components/register';
 
 export default function NewAccount() {
   return (
-    <Layout wider>
+    <Layout goHome >
       <Register />
     </Layout>
   )
