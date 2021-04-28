@@ -2,9 +2,9 @@ import Head from 'next/head';
 import Link from 'next/link';
 import styles from './layout.module.css';
 
-export default function Layout({ children, authenticated, wider }) {
+export default function Layout({ children, authenticated, goHome }) {
     return (
-        <div className={wider ? styles.wider : styles.container}>
+        <div className={styles.container}>
           <Head>
             <meta
               name='keywords'
@@ -29,10 +29,10 @@ export default function Layout({ children, authenticated, wider }) {
           </header>
           <main>{children}</main>
 
-          {wider && (
+          {goHome && (
             <div className={styles.backToLogin}>
               <Link href='/'>
-                <a>← Back to login page</a>
+                <a>← I already have an account</a>
               </Link>
             </div>
           )}
