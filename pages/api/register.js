@@ -1,6 +1,6 @@
 import nextConnect from 'next-connect';
 import auth from '../../middleware/auth';
-import { createUser, findUserById, findUserByUsername } from '../../utils/db';
+import { createUser, findUserByUsername } from '../../utils/db';
 
 const handler = nextConnect();
 
@@ -12,11 +12,10 @@ handler
 
     const { username: user } = req.query;
     const userExists = await findUserByUsername(user);
+    // console.log(!!userExists);
 
-    console.log(!!userExists);
-
-    if (userExists) {
-      res.status(200).send('Username is taken');
+    if (!!userExists) {
+      res.status(200).send('Username not available');
     } else {
       res.status(201).send('Username available');
     }
