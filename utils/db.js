@@ -18,21 +18,24 @@ import { ObjectID } from 'mongodb';
   * @param {Object} param0 Request object containing username
   * password, and name supplied.
   */
-export async function createUser({ username, password, name }) {
+export async function createUser({ username, password }) {
   const { db } = connectToDatabase();
   const hash = await argon2.hash(password, {
     type: argon2.argon2i
   });
 
   const newUser = {
-    createdAt: Date.now(),
+    dateCreated: Date.now(),
     username,
-    name,
     hash
   }
 
   // will be used by the useUser hook
-  await db.insertOne(newUser);
+  await db.insertOne(newUser, (err, doc) => {
+    if (err) return err;
+
+    return doc.ops[0];
+  });
 };
 
 /** finding and returning the user object by ID 
@@ -70,5 +73,39 @@ export async function validatePassword({ hash }, passwordEntered) {
 
   const passwordsMatch = hash === inputHash;
   return passwordsMatch;
+}
+
+
+// function for finding and/or updating user for Google OAuth
+export async function findOrUpdateUser(profile, done) {
+  const { db } = await connectToDatabase();
+
+  db.findOneAndUpdate(
+    {id: profile.id},
+    {
+      $setOnInsert: {
+        id: profile.id,
+        name: profile.name || 'New User',
+        photo: profile.picture,
+        email: profile.email || 'No public email',
+        createdOn: new Date(),
+        provider: profile.provider || ''
+      },
+
+      $set: {
+        lastLogin: new Date()
+      },
+
+      $inc: {
+        loginCount: 1
+      }
+    },
+
+    {upsert: true, new: true},
+    (err, doc) => {
+      if (err) return done(err);
+      return done(null, doc.value);
+    } 
+  )
 }
 
