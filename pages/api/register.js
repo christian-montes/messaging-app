@@ -12,7 +12,7 @@ handler
 
     const { username: user } = req.query;
     const userExists = await findUserByUsername(user);
-    // console.log(!!userExists);
+    console.log(!!userExists);
 
     if (!!userExists) {
       res.status(200).send('Username not available');
@@ -20,17 +20,24 @@ handler
       res.status(201).send('Username available');
     }
   })
-  .post((req, res) => {
+  .post(async (req, res) => {
 
     const { body: userInformation } = req;
-    const newUser = createUser(userInformation);
+    const { username, password } = req.body;
 
-    req.login(newUser, (err) => {
+    if (!username || !password) {
+      return res.status(400).send('Missing required fields')
+    }
+
+    const user = await createUser(userInformation);
+    // console.log(userInformation)
+
+    req.login(user, (err) => {
       if (err) throw err
 
       // log the newly registered user in
       // status 201: new resource created
-      res.status(201).json({newUser})
+      res.status(201).json({user})
     })
   });
 
