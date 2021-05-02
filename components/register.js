@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import RegisterButton from './register-buttons';
 import axios from 'axios';
+import Router from 'next/router';
+import { useUser } from '../utils/useUser';
 
 export default function Register() {
 
@@ -8,6 +10,8 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [style, setStyle] = useState({border: '1px solid lightgrey'});
   const [message, setMessage] = useState('');
+  const [status, setStatus] = useState(0);
+  const [user, { mutate }] = useUser('');
 
   const registerUser = async event => {
     event.preventDefault();
@@ -19,14 +23,32 @@ export default function Register() {
         'Content-Type': 'application/json'
       },
       data: {
-        username: event.target.username.value,
-        password: event.target.password.value
+        username,
+        password
       }
     });
 
-    const { registerSuccess } = response;
+    const { status } = response;
+    const { data } = response;
+
+    if (status === 201) {
+      const userObj = data;
+      mutate(userObj);
+    } else {
+      setMessage(data);
+    }
 
   }
+
+  // conditional side effect
+  // effect only executes when user variable changes
+  useEffect(() => {
+
+    // if there is a user object, redirect to profile page
+    if (user) Router.push('/profile')
+  }, [user])
+
+
 
   const checkUsername = async event => {
     event.preventDefault();
@@ -45,19 +67,36 @@ export default function Register() {
     });
 
     // console.log(response)
+    const { data } = response;
     const { status } = response;
     (!status) ? (
       setStyle({border: '1px solid lightgrey'}),
-      setMessage('')
+      setMessage(''),
+      setStatus(0)
     )
     : (status === 201) ? (
       setStyle({border: '2px solid green'}),
-      setMessage('Username available')
+      setMessage(data),
+      setStatus(status)
     ) 
     : (
       setStyle({border: '2px solid red'}),
-      setMessage('Username not available')
+      setMessage(data),
+      setStatus(status)
     )
+
+  }
+
+  const checkPassword = event => {
+    event.preventDefault();
+
+    setPassword(event.target.value);
+
+    if (event.target.value.length >= 5) {
+      event.target.style.border = '2px solid green'
+    } else {
+      event.target.style.border = '1px solid lightgrey'
+    }
 
   }
 
@@ -66,7 +105,15 @@ export default function Register() {
       <h2>Register an account</h2>
 
       <div className='container'>
-        <div className='row mx-1'>{message ? message : ''}</div>
+        <div 
+          className='d-flex flex-row-reverse col-sm-8 mx-1'
+          style={(message && status === 201) ? 
+          {visibility: 'visible', color: 'green'} 
+          : (message && status === 200) ? 
+          {visibility: 'visible', color: 'red'}
+          : {visibility: 'hidden'}}>
+            {message ? message : 'hidden'}
+        </div>
         <form className='col-sm-8 mb-3' onSubmit={registerUser}>
           <div className='form-floating mb-2'>
             <input
@@ -86,13 +133,13 @@ export default function Register() {
             <input 
               defaultValue={password}
               name='password'
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={checkPassword}
               type='password' 
               className='form-control' 
               id='password'
               placeholder='Password'
             />
-            <label htmlFor='password'>Password</label>
+            <label htmlFor='password'>Password (5+ characters)</label>
           </div>
 
           <div className='d-grid gap-2'>
