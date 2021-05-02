@@ -3,7 +3,6 @@ import styles from '../styles/Home.module.css';
 import Layout from '../components/layout';
 import LoginForm from '../components/login';
 import RegisterButton from '../components/register-buttons';
-import Register from '../components/register';
 
 export default function Home() {
   return (
