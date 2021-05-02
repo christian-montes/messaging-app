@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faGithubSquare } from  '@fortawesome/free-brands-svg-icons';
 import axios from 'axios';
 
-export default function RegisterButton({ google }) {
+export default function RegisterButton({ google, login }) {
 
   const googleAuth = async event => {
     event.preventDefault();
@@ -29,7 +29,9 @@ export default function RegisterButton({ google }) {
         onClick={google ? googleAuth : githubAuth}
       >
           <span className='bigger-icon'><FontAwesomeIcon icon={google ? faGoogle : faGithubSquare} /></span>{' '}
-          {google ? 'Sign up with Google' : 'Sign up with GitHub'}
+          {google ? 
+          (login ? 'Login with Google' : 'Sign up with Google') : 
+          (login ? 'Login with GitHub' : 'Sign up with GitHub')}
       </button>
     </>
   )
